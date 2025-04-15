@@ -28,6 +28,9 @@ export async function fetchUser(token: string) {
       (await cookies()).delete('token')
       redirect('/auth')
     }
+    if(response.status===401){
+      redirect('/auth')
+    }
     return response.data as { msg:string,userInfo:UserProfileData, error:any }; // ✅ Now .data is correctly accessed
   } catch (error) {
     if (error instanceof AxiosError) {
