@@ -1,18 +1,17 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React, { createContext, useContext, useState } from "react";
 import Cookies from "js-cookie";
 import { useQuery } from "@tanstack/react-query";
 import { Loader } from "lucide-react";
 import { fetchUser } from "@/actions/auth";
-
 interface AuthData {
   token: string;
-  userData: any;
+  userData: UserProfileData | null;
 }
 
-interface UserProfileData {
+export interface UserProfileData {
   id: string;
   phoneNumber: string;
   name: string;
@@ -38,8 +37,8 @@ export const AuthProvider: React.FC<{
   });
 
   const router = useRouter();
+  const pathname = usePathname()
   const token = Cookies.get("token");
-
   const { data, isLoading } = useQuery(
     ["fetchUser"],
     () => fetchUser(token!),
@@ -50,10 +49,9 @@ export const AuthProvider: React.FC<{
           token: token!,
           userData: data?.userInfo || null,
         });
-        if (data) {
-          void router.push("/find-rides");
-        }else{
-            void router.push('/auth')
+        if (!authData?.userData) {
+          if (pathname == '/auth')
+            void router.push("/find-rides");
         }
       },
       onError: () => {
@@ -86,7 +84,7 @@ export const AuthProvider: React.FC<{
     <AuthContext.Provider
       value={{ authData, setUserData, setToken, handleSignOut }}
     >
-      {!!token && isLoading ? (
+      {token && isLoading? (
         <main className="flex min-h-screen w-full items-center justify-center text-lg text-muted-foreground">
           <Loader className="mr-2 size-4 animate-spin" />
           Loading...

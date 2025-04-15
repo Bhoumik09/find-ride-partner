@@ -1,0 +1,21 @@
+import React from 'react'
+import FindRidesForm from './form'
+import { toast } from 'sonner';
+import getAllPlaces from '@/actions/places';
+import { findUserRides } from '@/actions/rides';
+import { useAuth } from '@/components/auth-provider';
+
+const page = async() => {
+    const {error, places}:{error:any, places:{id:number, name:string}[]} = await getAllPlaces();
+    if(error){
+        toast.error("Error fetching places")  
+    }
+    
+  return (
+    <div>
+      <FindRidesForm allPlaces={places} />
+    </div>
+  )
+}
+
+export default page

@@ -37,51 +37,104 @@ import { useForm } from "react-hook-form"
 import { CalendarIcon, CarTaxiFront, Clock, Loader2, MapPin, Search, UsersIcon } from "lucide-react"
 import { format } from "date-fns"
 import { toast } from "sonner"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-const FormSchema = z.object({
-    source: z
-        .string({
-            required_error: "Please select an source to display.",
-        }),
+import { useRouter } from "next/navigation"
+import Cookies from 'js-cookie'
+import { findRideFormSchema, Rides } from "@/lib/types"
+import { deleteRide, findRides, findUserRides } from "@/actions/rides"
+import { useMutation } from "@tanstack/react-query"
+import { useAuth } from "@/components/auth-provider"
+import { RideCard } from "@/components/rideCard"
+import { Skeleton } from "@/components/ui/skeleton"
+import { RidesSkeleton } from "@/components/ridesSkeleton"
 
-    destination: z
-        .string({
-            required_error: "Please select an destination to display.",
-        }),
-    dob: z.date({
-        required_error: "A date of birth is required.",
-    }),
-    number_people: z.string({
-        required_error: "Number of people are required ",
-    }),
-    gender: z.enum(["male", "female", "any"], {
-        required_error: "You need to the gender preference.",
-    }),
+export default function FindRidesForm({ allPlaces }: { allPlaces: { id: number, name: string }[] }) {
+    const router = useRouter();
+    const auth = useAuth();
+    const deleteMutation=useMutation({
+        mutationFn:deleteRide,
+        mutationKey:['deleteRide']
+    })
 
-})
+    const [rideData, setRidesData] = useState<any>();
+    console.log(auth.authData?.userData?.gender)
+    const token = Cookies.get('token');
+    const [userRides, setUserRides] = useState<Rides[]|undefined>(undefined);
+    const getUserRide = async () => {
+        const response: { msg: string, ridesData: Rides[], error: any } = await findUserRides({ token: token as string })
+        if (!response.ridesData) {
+            toast.error("Error on fetching user data");
+            return;
+        }
+        setUserRides(response?.ridesData)
+    }
+    const deleteTheRide=async(id:string)=>{
+        const response :{msg:string,error:any}=await deleteMutation.mutateAsync({token:token!,rideId:id})
+        if(response.msg){
+            toast.success("Ride deleted successfully",{
+                description:response.msg
+            });
+            setUserRides(()=>userRides?.filter((ride:Rides)=>ride.id!==id))
 
-export default function Home() {
-    const form = useForm<z.infer<typeof FormSchema>>({
-        resolver: zodResolver(FormSchema),
+        }else{
+            toast.warning("Error occured while deleting the ride", {
+                description:response.error
+            });
+
+        }
+    }
+    useEffect(() => {
+        if (!token) {
+            void router.push('/auth')
+            return;
+        }
+        getUserRide()
+    }, [])
+    const form = useForm<z.infer<typeof findRideFormSchema>>({
+        resolver: zodResolver(findRideFormSchema),
+        defaultValues: {
+            source: "", // Set default value to the first place's ID
+            destination: "", // Set default value to the first place's ID
+            dob: undefined, // Set default value for Date of Journey to today's date
+            number_people: "", // Default number of passengers
+            gender: "both", // Default gender preference
+        }
+
+    })
+    const findRidesMutation = useMutation({
+        mutationKey: ["findRides"],
+        mutationFn: findRides,
     })
     const [buttonState, setButtonState] = useState<"wait" | "ready">("ready");
     const numbers: number[] = [2, 3, 4, 5, 6, 7, 8, 9, 10];
-    function onSubmit(data: z.infer<typeof FormSchema>) {
-        setButtonState("wait");
-        if (data.destination === data.source) {
+    
+    async function onSubmit(data: z.infer<typeof findRideFormSchema>) {
+
+        if (data.source !== "" && data.destination != "" && data.destination === data.source) {
             toast.error("Souce and destination cannot be same", {
                 style: { backgroundColor: "#e80d33" },
                 duration: 5000
             });
             return;
         }
-        setTimeout(() => { setButtonState("ready") }, 5000);
+
+        const response: { msg: string, ridesData: any, error: any } = await findRidesMutation.mutateAsync({ payload: data, token: token as string })
+        if (response?.ridesData) {
+            toast.success("Rides Fetched")
+            setRidesData(response.ridesData);
+        } else {
+            toast.error("These was an error in fetching rides", response.error);
+            Cookies.remove('token');
+            router.push('/auth')
+        }
+        form.reset()
+
 
     }
     return (
@@ -102,17 +155,17 @@ export default function Home() {
                                         name="source"
                                         render={({ field }) => (
                                             <FormItem className="w-full" >
-                                                <FormLabel>Email</FormLabel>
-                                                <Select onValueChange={field.onChange} >
+                                                <FormLabel>Source</FormLabel>
+                                                <Select onValueChange={field.onChange} value={typeof field.value === 'string' ? field.value : String(field.value)} defaultValue={String(field.value)} >
                                                     <FormControl>
                                                         <SelectTrigger className="w-full bg-white">
                                                             <SelectValue placeholder="Pls select the Source" />
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent className="bg-white">
-                                                        <SelectItem value="college">VIT Bhopal</SelectItem>
-                                                        <SelectItem value="bhopal-rail">Bhopal Railway Station</SelectItem>
-                                                        <SelectItem value="bhopal-air">Bhopal Airport</SelectItem>
+                                                        {allPlaces?.map((place) => (
+                                                            <SelectItem key={place.id} value={String(place.id)}>{place.name}</SelectItem>
+                                                        ))}
                                                     </SelectContent>
                                                 </Select>
                                                 <FormMessage />
@@ -126,16 +179,16 @@ export default function Home() {
                                         render={({ field }) => (
                                             <FormItem className="w-full">
                                                 <FormLabel>Destination</FormLabel>
-                                                <Select onValueChange={field.onChange} >
+                                                <Select onValueChange={field.onChange} value={typeof field.value === 'string' ? field.value : String(field.value)} defaultValue={String(field.value)} >
                                                     <FormControl>
                                                         <SelectTrigger className="w-full bg-white">
                                                             <SelectValue placeholder="Pls select the Destination" />
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent className="bg-white">
-                                                        <SelectItem value="college">VIT Bhopal</SelectItem>
-                                                        <SelectItem value="bhopal-rail">Bhopal Railway Station</SelectItem>
-                                                        <SelectItem value="bhopal-air">Bhopal Airport</SelectItem>
+                                                        {allPlaces?.map((place) => (
+                                                            <SelectItem key={place.id} value={String(place.id)}>{place.name}</SelectItem>
+                                                        ))}
                                                     </SelectContent>
                                                 </Select>
                                                 <FormMessage />
@@ -163,7 +216,7 @@ export default function Home() {
                                                                 )}
                                                             >
                                                                 {field.value ? (
-                                                                    format(new Date(field.value), "PPP")
+                                                                    format(field.value ? new Date(field.value) : "", "PPP")
                                                                 ) : (
                                                                     <span>Pick a date</span>
                                                                 )}
@@ -198,7 +251,7 @@ export default function Home() {
                                         render={({ field }) => (
                                             <FormItem className="w-full">
                                                 <FormLabel>Passengers Required</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value} >
+                                                <Select onValueChange={field.onChange} value={typeof field.value === 'string' ? field.value : String(field.value)} defaultValue={String(field.value)} >
                                                     <FormControl className="w-full">
                                                         <SelectTrigger className="w-full truncate bg-white">
                                                             <SelectValue placeholder="Pls select the number of passengers" />
@@ -232,23 +285,16 @@ export default function Home() {
                                                 >
                                                     <FormItem className="flex items-center space-x-3 space-y-0">
                                                         <FormControl>
-                                                            <RadioGroupItem className="bg-white" value="male" />
+                                                            <RadioGroupItem className="bg-white" value={auth.authData?.userData?.gender!} />
                                                         </FormControl>
                                                         <FormLabel className="font-medium">
-                                                            Male
+                                                            Same Gender
                                                         </FormLabel>
                                                     </FormItem>
+
                                                     <FormItem className="flex items-center space-x-3 space-y-0">
                                                         <FormControl>
-                                                            <RadioGroupItem className="bg-white" value="female" />
-                                                        </FormControl>
-                                                        <FormLabel className="font-medium">
-                                                            Female
-                                                        </FormLabel>
-                                                    </FormItem>
-                                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                                        <FormControl>
-                                                            <RadioGroupItem className="bg-white" value="any" />
+                                                            <RadioGroupItem className="bg-white" value="both" />
                                                         </FormControl>
                                                         <FormLabel className="font-medium">No Preference</FormLabel>
                                                     </FormItem>
@@ -269,75 +315,32 @@ export default function Home() {
 
             </div>
             <div className=" w-full flex justify-between px-4 font-bold text-3xl">
-                <p className="font-serif">Available Rides</p>
-                <Button variant={"secondary"}>
-                    <Search color="green" size={12} strokeWidth={3} className="animate-pulse" />
-                    View all Rides</Button>
+                <p className="font-serif">My Rides</p>
+               
             </div>
+            <div className="flex overflow-x-scroll scrollbar-hide  gap-9 p-5">
+                {!userRides
+                    ? Array.from({ length: 3 }).map((_, idx) => (
+                        <RidesSkeleton key={idx} />
+                    ))
+                    : userRides?.map((ride: Rides) => (
+                        <RideCard ride={ride} key={ride?.id} deleteTheRide={deleteTheRide} />
+
+                    ))}
+
+            </div>
+            <div className=" w-full flex justify-center  font-bold text-3xl">
+                <p className="font-serif px-4">Available Rides</p>
+               
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 p-10 gap-10">
-                <Card>
-                    <CardContent>
-                        <div className="flex flex-col gap-3">
-                            <div className="flex justify-between">
-                                <div className="flex">
-                                    <Avatar className="size-10 sm:size-16">
-                                        <AvatarImage src="https://github.com/shadcn.png" />
-                                        <AvatarFallback>CN</AvatarFallback>
-                                    </Avatar>
-                                    <div className="px-1 md:px-2">
-                                        <p className=" text-sm sm:text-xl font-bold font-serif">Bhoumik Chopra</p>
-                                        <Badge className="max-sm:text-xs">Male</Badge>
-                                    </div>
-                                </div>
-                                <div className="flex gap-3">
-                                    <div className="font-semibold text-md sm:text-xl whitespace-nowrap">2000 Rs</div>
-                                    <Menubar className="h-6 p-0 ">
-                                        <MenubarMenu >
-                                            <MenubarTrigger className="h-full w-full psrc/components/uib-2">...</MenubarTrigger>
-                                            <MenubarContent className="h-full w-full ">
-                                                
-                                                <MenubarItem>New Window</MenubarItem>
-                                                <MenubarSeparator />
-                                                <MenubarItem>Share</MenubarItem>
-                                                <MenubarSeparator />
-                                                <MenubarItem>Print</MenubarItem>
-                                            </MenubarContent>
-                                        </MenubarMenu>
-                                    </Menubar>
-                                </div>
-                            </div>
-
-                            <div className="flex items-start ">
-                                <MapPin className="w-6 h-6 md:w-7 md:h-7" />
-
-                                <div className="flex flex-col justify-start">
-                                    <p className="inline-block px-2  font-semibold text-md sm:text-xl">VIT Bhopal </p>
-                                    <p className="opacity-50 max-sm:text-sm ">to Bhopal Railway Station</p>
-                                </div>
-
-                            </div>
-                            <div className="flex gap-2 items-center">
-                                <Clock className="size-6 md:size-7" />
-                                <p className="max-sm:text-sm text-lg">At 5:30 Am , 23rd April </p>
-                            </div>
-                            <div className="flex gap-2 items-center">
-                                <UsersIcon className="size-6 md:size-7" />
-                                <p className="max-sm:text-sm text-lg">3  Available </p>
-                            </div>
-                            <div className="flex gap-2 items-center">
-                                <CarTaxiFront className="size-6 md:size-7" />
-                                <p className="max-sm:text-sm text-lg"> Artiga</p>
-                            </div>
-                            <Button>View and Chat</Button>
-
-
-
-
-
-                        </div>
-
-                    </CardContent>
-                </Card>
+                {!findRidesMutation.isLoading ? rideData?.map((ride: any) => (
+                    <RideCard ride={ride} key={ride?.id} />)) :
+                    Array.from({ length: 3 }).map((_, idx) => (
+                        <RidesSkeleton key={idx} />
+                    ))
+                }
 
             </div>
 

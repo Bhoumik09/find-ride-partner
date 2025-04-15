@@ -1,5 +1,8 @@
+
 'use client'
 
+import { postNewRide } from "@/actions/rides";
+import { useAuth } from "@/components/auth-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -12,55 +15,68 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { formSchema } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { CalendarIcon, Car, Clock, Info, MapPin } from "lucide-react";
+import { CalendarIcon, Car, Clock, Info, Loader, MapPin } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 // Define schema
-const formSchema = z.object({
-    source: z.string({ required_error: "Fill the source field" }),
-    destination: z.string({ required_error: "Fill the destination field" }),
-    dateOfJourney: z.union([z.date(), z.string()]),
-    timeOfJourney: z.string({ required_error: "Fill the time of departure" }),
-    nameOfCar: z.string({ required_error: "Enter the name of the Car" }),
-    noOfSeats: z.string({ required_error: "Enter the number of seats Available" }),
-    price: z.coerce.number({ required_error: "Enter the price of the cab" }),
-    gender: z.enum(["male", "female", "any"], { required_error: "Select an option" }),
-    meetingPointArr: z.array(z.string().min(1, "Meeting point cannot be empty")),
-    meetingPoint: z.string(),
-    allowChat: z.boolean(),
-    phone: z.string({ required_error: "Enter your mobile number" }),
-})
 
 
-export default function Page() {
+
+export default function RideForm({ allPlaces }: { allPlaces: { id: number, name: string }[] }) {
+    const auth = useAuth();
+    const userGender: 'male' | 'female' | undefined = auth.authData?.userData?.gender;
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            source: "",
-            destination: "",
-            dateOfJourney: "", // as string
-            timeOfJourney: "",
-            nameOfCar: "",
-            noOfSeats: "",
+            source: undefined,
+            destination: undefined,
+            date: "", // as string
+            time: "",
+            vehicleName: "",
+            seats: "",
             price: 0,
-            gender: "any",
+            genderPreference: "both",
             meetingPointArr: [],
             meetingPoint: "",
             allowChat: false,
-            phone: "",
+            number: "",
+            additionalInfo: "",
         },
     })
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values)
+    const postRideMutation = useMutation({
+        mutationKey: ["postNewRide"],
+        mutationFn: postNewRide,
+
+    })
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        if (values.source === values.destination) {
+            form.setError("source", { message: "Source and destination cannot be the same" });
+            form.setError("destination", { message: "Source and destination cannot be the same" });
+            changeFormState("one");
+            return;
+        }
+        const { meetingPoint, ...filteredPayload } = values;
+        const response: { msg: string, error: any } = await postRideMutation.mutateAsync({ payload: filteredPayload, token: auth.authData?.token! });
+        if (response.msg) {
+            form.reset();
+            changeFormState("one");
+            toast.success("Ride is created succesfully");
+        } else {
+            toast.error("Failed to create the ride due to following error", { description: response.error });
+
+        }
     }
-    const seats: number[] = [2, 3, 4, 5, 6, 7, 8, 9, 10];
-    const [formState, changeFormState] = useState<"one" | "two">("two");
+    const seats: number[] = [1,2, 3, 4, 5, 6, 7, 8, 9, 10,11,12,13,14,15,16,17];
+    const [formState, changeFormState] = useState<"one" | "two">("one");
     const addingMeetingPoint = () => {
         const ptArray: string[] = form.watch("meetingPointArr") || [];
         const pt: string | undefined = form.watch("meetingPoint");
@@ -71,9 +87,9 @@ export default function Page() {
 
     }
     const formValues = form.watch();
-    let isOneStepComplete = formValues.dateOfJourney && formValues.destination && formValues.noOfSeats && formValues.nameOfCar && formValues.source && formValues.timeOfJourney;
+    let isOneStepComplete = formValues.date && formValues.destination && formValues.seats && formValues.vehicleName && formValues.source && formValues.time;
     return (
-        <div className="bg-blue-50 overflow-auto h-screen xs:px-20 md:px-40 py-20">
+        <div className="bg-blue-50 xs:px-20 md:px-40 py-20">
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
@@ -107,16 +123,17 @@ export default function Page() {
                                     render={({ field }) => (
                                         <FormItem className="w-full">
                                             <FormLabel><MapPin /> Source</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <Select disabled={!allPlaces} onValueChange={field.onChange} >
                                                 <FormControl>
                                                     <SelectTrigger className="w-full">
                                                         <SelectValue placeholder="Select the source" />
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent className="w-full">
-                                                    <SelectItem value="college">VIT Bhopal</SelectItem>
-                                                    <SelectItem value="bhopal-rail">Bhopal Railway Station</SelectItem>
-                                                    <SelectItem value="bhopal-air">Bhopal Airport</SelectItem>
+                                                    {allPlaces?.map((place) => (
+                                                        <SelectItem key={place.id} value={String(place.id)}>{place.name}</SelectItem>
+                                                    ))}
+
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />
@@ -129,16 +146,16 @@ export default function Page() {
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel> <MapPin /> Destination</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <Select disabled={!allPlaces} onValueChange={field.onChange} >
                                                 <FormControl>
                                                     <SelectTrigger className="w-full">
                                                         <SelectValue placeholder="Select a verified email to display" />
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    <SelectItem value="college">VIT Bhopal</SelectItem>
-                                                    <SelectItem value="bhopal-rail">Bhopal Railway Station</SelectItem>
-                                                    <SelectItem value="bhopal-air">Bhopal Airport</SelectItem>
+                                                    {allPlaces?.map((place) => (
+                                                        <SelectItem key={place.id} value={String(place.id)}>{place.name}</SelectItem>
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
 
@@ -150,7 +167,7 @@ export default function Page() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 w-full gap-3">
                                     <FormField
                                         control={form.control}
-                                        name="dateOfJourney"
+                                        name="date"
                                         render={({ field }) => (
                                             <FormItem className="flex flex-col w-full">
                                                 <FormLabel>Date of Journey</FormLabel>
@@ -178,8 +195,10 @@ export default function Page() {
                                                             mode="single"
                                                             selected={field.value ? new Date(field.value) : undefined}
                                                             onSelect={field.onChange}
-                                                            disabled={(date) =>
-                                                                date > new Date() || date < new Date("1900-01-01")
+                                                            disabled={(date: Date) =>{
+                                                                const today = new Date();
+                                                                today.setHours(0, 0, 0, 0); // reset time to midnight
+                                                                return date < today;}
                                                             }
                                                             initialFocus
                                                         />
@@ -193,24 +212,26 @@ export default function Page() {
 
                                     <FormField
                                         control={form.control}
-                                        name="timeOfJourney"
+                                        name="time"
+    
                                         render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Username</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Time of Journey" type="time"  {...field} />
+                                            <FormItem className="w-full">
+                                                <FormLabel>Time of Journey</FormLabel>
+                                                <FormControl className="w-full">
+                                                    <Input className="w-full" placeholder="Time of Journey" type="time" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
                                     />
+
                                 </div>
                                 <FormLabel className="flex gap-2"><Car />Vehicles and Seats</FormLabel>
                                 <div className="grid grid-cols-1 md:grid-cols-2 w-full gap-3">
 
                                     <FormField
                                         control={form.control}
-                                        name="nameOfCar"
+                                        name="vehicleName"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Vehicle</FormLabel>
@@ -224,7 +245,7 @@ export default function Page() {
                                     />
                                     <FormField
                                         control={form.control}
-                                        name="noOfSeats"
+                                        name="seats"
                                         render={({ field }) => (
                                             <FormItem className="w-full">
                                                 <FormLabel>Number of seats </FormLabel>
@@ -277,7 +298,7 @@ export default function Page() {
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="phone" // Make sure this matches your schema
+                                    name="number" // Make sure this matches your schema
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Phone number</FormLabel>
@@ -291,7 +312,7 @@ export default function Page() {
                                 <FormLabel>Select Gender Preference</FormLabel>
                                 <FormField
                                     control={form.control}
-                                    name="gender"
+                                    name="genderPreference"
                                     render={({ field }) => (
                                         <FormItem className="space-y-3 m-3 ">
                                             <FormControl>
@@ -302,23 +323,16 @@ export default function Page() {
                                                 >
                                                     <FormItem className="flex items-center space-x-3 space-y-0">
                                                         <FormControl>
-                                                            <RadioGroupItem className="bg-white" value="male" />
+                                                            <RadioGroupItem className="bg-white" value={userGender!} />
                                                         </FormControl>
                                                         <FormLabel className="font-medium">
-                                                            Male
+                                                            {userGender?.slice(0, 1).toUpperCase()}{userGender?.slice(1)}
                                                         </FormLabel>
                                                     </FormItem>
+
                                                     <FormItem className="flex items-center space-x-3 space-y-0">
                                                         <FormControl>
-                                                            <RadioGroupItem className="bg-white" value="female" />
-                                                        </FormControl>
-                                                        <FormLabel className="font-medium">
-                                                            Female
-                                                        </FormLabel>
-                                                    </FormItem>
-                                                    <FormItem className="flex items-center space-x-3 space-y-0">
-                                                        <FormControl>
-                                                            <RadioGroupItem className="bg-white" value="any" />
+                                                            <RadioGroupItem className="bg-white" value="both" />
                                                         </FormControl>
                                                         <FormLabel className="font-medium">No Preference</FormLabel>
                                                     </FormItem>
@@ -331,7 +345,7 @@ export default function Page() {
 
                                 <FormField
                                     control={form.control}
-                                    name="timeOfJourney"
+                                    name="additionalInfo" // Make sure this matches your schema
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Additional Information</FormLabel>
@@ -402,7 +416,8 @@ export default function Page() {
                                 />
                                 <div className="flex justify-between mt-2">
                                     <Button variant={"outline"} onClick={() => changeFormState("one")} type="button">Back</Button>
-                                    <Button disabled={!isOneStepComplete} type="submit">Publish Ride</Button>
+                                    {!postRideMutation.isLoading ? <Button disabled={!isOneStepComplete} type="submit">Publish Ride</Button> : <Button disabled={!isOneStepComplete} type="submit" className="cursor-not-allowed" variant={"default"}>
+                                        <Loader className="animate-spin" /> Publishing...</Button>}
 
                                 </div>
                             </CardContent>
