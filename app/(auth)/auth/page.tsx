@@ -1,5 +1,4 @@
 'use client'
-import Image from "next/image";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button"
 import {
@@ -26,10 +25,9 @@ import { login, resetPass, signUp } from "@/actions/auth";
 import { toast } from "sonner";
 import { useAuth } from "@/components/auth-provider";
 import { AxiosError } from "axios";
-import { useRouter } from "next/navigation";
 
 export default function Home() {
-    const { authData, setToken, setUserData } = useAuth()
+    const { setToken} = useAuth()
     const [loginUser, setLoginUsername] = useState<string | null>();
     const [loginPassword, setLoginPassword] = useState<string | null>();
     const [numberLogin, setNumberLogin] = useState<string | null>();
