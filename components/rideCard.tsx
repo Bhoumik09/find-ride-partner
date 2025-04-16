@@ -12,7 +12,7 @@ import { Rides } from "@/lib/types";
 
 export const RideCard: React.FC<any> = ({ ride , deleteTheRide}:{ride:Rides, deleteTheRide:(id:string)=>void}) => {
     const auth = useAuth();
-    const userId = auth.authData?.userData?.id
+    const userId = auth.authData?.userData?.id;
     return (
         <Card>
             <CardContent>

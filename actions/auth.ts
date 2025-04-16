@@ -1,7 +1,7 @@
 "use server";
 import { UserProfileData } from "@/components/auth-provider";
 import { API } from "@/lib/api";
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { cookies } from 'next/headers';
 import { redirect } from "next/navigation";
 
@@ -19,45 +19,47 @@ interface SignUpPayload {
 }
 export async function fetchUser(token: string) {
   try {
-    const response = await API.get("/auth/fetch-user", {
+    const response:AxiosResponse = await API.get("/auth/fetch-user", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    if(response.status===403){
-      (await cookies()).delete('token')
-      redirect('/auth')
-    }
-    if(response.status===401){
-      redirect('/auth')
-    }
+    
     return response.data as { msg:string,userInfo:UserProfileData, error:any }; // ✅ Now .data is correctly accessed
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.error(error.message);
-      console.log(error.response?.data);
+      const serverMessage = error.response?.data?.msg || "Session Expired";
+      
+      return {error:serverMessage} as { msg:string,userInfo:UserProfileData, error:any };
+
+      
     }
-    return null;
+    return {error:"Something went wrong"} as { msg:string,userInfo:UserProfileData, error:any };
+
   }
 }
 export async function fetchUserName(token: string|undefined) {
   try {
-    const response = await API.get("/auth/fetch-user-name", {
+    const response:AxiosResponse = await API.get("/auth/fetch-user-name", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    if(response.status===403){
-      (await cookies()).delete('token')
-      redirect('/auth')
-    }
     return response.data as { msg:string,userInfo:{name:string, id:string} }; // ✅ Now .data is correctly accessed
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.error(error.message);
-      console.log(error.response?.data);
+      // 👇 Check if the server sent a custom error message
+      const serverErrorMsg = error.response?.data?.error || "User Info Fetch fe failed failed";
+
+
+      // You can return or throw based on how your frontend handles it
+      return {error:serverErrorMsg}
+    } else {
+      // Unknown error (not Axios)
+      console.error("Unexpected error:", error);
+      return {error:error}
+
     }
-    return null;
   }
 }
 
@@ -65,31 +67,64 @@ export async function fetchUserName(token: string|undefined) {
 
 export async function login(payload: LoginPayload) {
   try {
-    console.log(payload)
-    const response = await API.post("/auth/login", payload);
-    return response.data as { token: string; error: any };
+    const response:AxiosResponse = await API.post("/auth/login", payload);
+    return response.data as { token: string; error: any ,msg:string };
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.log(error.response?.data);
-      console.error(error.message);
+      // 👇 Check if the server sent a custom error message
+      const serverErrorMsg = error.response?.data?.error || "Signup failed";
 
-      return error.response?.data;
+      console.error("Signup error:", serverErrorMsg);
+
+      // You can return or throw based on how your frontend handles it
+      return {error:serverErrorMsg}
+    } else {
+      // Unknown error (not Axios)
+      console.error("Unexpected error:", error);
+      throw new Error("Something went wrong. Please try again.");
     }
   }
 }
 export async function signUp(payload: SignUpPayload) {
   try {
-    console.log(payload)
-    const response = await API.post("/auth/signup", payload);
-    console.log(response.data);
+    const response:AxiosResponse = await API.post("/auth/signup", payload);
+    console.log(response)
     return response.data as { token: string; error: any };
-  } catch (error) {
+  } catch (error:any) {
     if (error instanceof AxiosError) {
-      console.log(error.response?.data);
-      console.error(error.message);
+      // 👇 Check if the server sent a custom error message
+      const serverErrorMsg = error.response?.data?.error || "Signup failed";
 
-      return error.response?.data;
+      console.error("Signup error:", serverErrorMsg);
+
+      // You can return or throw based on how your frontend handles it
+      return {error:serverErrorMsg}
+    } else {
+      // Unknown error (not Axios)
+      console.error("Unexpected error:", error);
+      throw new Error("Something went wrong. Please try again.");
     }
   }
 }
+export async function resetPass(payload: LoginPayload) {
+  try {
+    const response:AxiosResponse = await API.put("/auth/forgot-pass", payload);
+    return response.data as { token: string; error: any };
+  } catch (error:any) {
+    if (error instanceof AxiosError) {
+      // 👇 Check if the server sent a custom error message
+      const serverErrorMsg = error.response?.data?.error || "Signup failed";
+
+      console.error("Signup error:", serverErrorMsg);
+
+      // You can return or throw based on how your frontend handles it
+      return {error:serverErrorMsg}
+    } else {
+      // Unknown error (not Axios)
+      console.error("Unexpected error:", error);
+      throw new Error("Something went wrong. Please try again.");
+    }
+  }
+}
+
 

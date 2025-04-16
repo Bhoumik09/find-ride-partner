@@ -6,8 +6,6 @@ import getAllPlaces from '@/actions/places';
 import { toast } from 'sonner';
 
 const page = async () => {
-   
-    
     const {error, places}:{error:any, places:{id:number, name:string}[]} = await getAllPlaces();
     if(error){
         toast.error("Error fetching places, Please reload")  

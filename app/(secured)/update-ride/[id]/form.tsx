@@ -1,6 +1,5 @@
 
 'use client'
-
 import { postNewRide, updateRide } from "@/actions/rides";
 import { useAuth } from "@/components/auth-provider";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { CalendarIcon, Car, Clock, Info, Loader, MapPin } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -34,7 +34,7 @@ export default function RideUpdateForm({ allPlaces, ridesData , rideId}: { allPl
     const auth = useAuth();
     console.log(ridesData);
     const seats: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
-
+    const router = useRouter()
     const userGender: 'male' | 'female' | undefined = auth.authData?.userData?.gender;
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -71,10 +71,10 @@ export default function RideUpdateForm({ allPlaces, ridesData , rideId}: { allPl
         const response: { msg: string, error: any } = await updateRideMutation.mutateAsync({ payload: filteredPayload, token: auth.authData?.token!, rideId:rideId });
         if (response.msg) {
             form.reset();
-            changeFormState("one");
-            toast.success("Ride is created succesfully");
+            toast.success("Ride is updated succesfully",{style:{backgroundColor:'lightgreen'}});
+            router.push('/find-rides');
         } else {
-            toast.error("Failed to create the ride due to following error", { description: response.error });
+            toast.error("Failed to updating the ride due to following error", { description: response.error , style:{backgroundColor:'#FF7276'}});
 
         }
     }

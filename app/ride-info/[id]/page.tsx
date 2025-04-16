@@ -11,14 +11,12 @@ import { cookies } from "next/headers"
 import { Rides } from "@/lib/types"
 const page = async ({ params }: { params: Promise<{ id: string }> }) => {
     const id = (await params).id;
-     const token = (await cookies()).get('token')?.value;
+    const token = (await cookies()).get('token')?.value;
     const response = await getRideData({ rideId: id, token:token! })
     if (response.status !== 200) {
         notFound()
     }
-    console.log(response.data);
     const { ridesData }:{ridesData:Rides} = response.data;
-    console.log(ridesData)
     return (
         <div className="">
             <header className="bg-gradient-to-br from-red-100 to-red-200 shadow-sm ">

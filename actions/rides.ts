@@ -1,4 +1,5 @@
 import { API } from "@/lib/api";
+import { BASE_URL } from "@/lib/constants";
 import { findRidesFormType, ridesFormType } from "@/lib/types";
 import axios, { AxiosError } from "axios";
 
@@ -18,7 +19,7 @@ export async function postNewRide({
     payload.time = time.toISOString();
 
     // Log the URL and the payload
-    const url = "http://localhost:5000/rides/create-ride";
+    const url = `${BASE_URL}/rides/create-ride`;
     console.log("Request URL:", url);
     console.log("Payload:", payload);
 
@@ -50,18 +51,12 @@ export async function updateRide({
   rideId: string;
 }) {
   try {
-    console.log("Payload before processing:", payload);
     const [hours, minutes] = payload.time.split(":").map(Number);
-    console.log("Hours:", hours, "Minutes:", minutes);
     const time = new Date(payload.date);
     time.setHours(hours, minutes, 0, 0);
     payload.time = time.toISOString();
-
     // Log the URL and the payload
-    const url = `http://localhost:5000/rides/ride/${rideId}`;
-    console.log("Request URL:", url);
-    console.log("Payload:", payload);
-
+    const url = `${BASE_URL}/rides/ride/${rideId}`;
     const response = await axios.put(url, payload, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -70,15 +65,11 @@ export async function updateRide({
 
     return response.data as { msg: string; error: any };
     // Log the response URL and status
-  } catch (error) {
+  } catch (error:any) {
     if (error instanceof AxiosError) {
-      console.log("Error URL:", error.config?.url); // log the request URL in case of an error
-      console.log("Error Status:", error.response?.status); // log the error status
-      console.log("Error Message:", error.message);
-      console.log("Error Response Data:", error.response?.data);
-
       return error.response?.data;
     }
+    return error.message
   }
 }
 export async function findRides({
@@ -110,9 +101,8 @@ export async function findRides({
         );
       }
     });
-    const { source, gender, destination, number_people, dob } = payload;
     // Log the URL and the payload
-    const url = `http://localhost:5000/rides/find-rides?${params.toString()}`;
+    const url = `${BASE_URL}/rides/find-rides?${params.toString()}`;
     console.log(url);
     console.log("Request URL:", url);
     console.log("Payload:", payload);
@@ -122,8 +112,12 @@ export async function findRides({
         Authorization: `Bearer ${token}`,
       },
     });
+    if(response.status!==200){
+      
+    }
     return response.data as { msg: string; ridesData: any; error: any };
     // Log the response URL and status
+
   } catch (error) {
     if (error instanceof AxiosError) {
       console.log("Error URL:", error.config?.url); // log the request URL in case of an error
@@ -137,7 +131,7 @@ export async function findRides({
 }
 export async function findUserRides({ token }: { token: string }) {
   try {
-    const response = await axios.get("http://localhost:5000/rides/user-rides", {
+    const response = await axios.get(`${BASE_URL}/rides/user-rides`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -164,7 +158,7 @@ export async function deleteRide({
 }) {
   try {
     const response = await axios.delete(
-      `http://localhost:5000/rides/ride/${rideId}`,
+      `${BASE_URL}/rides/ride/${rideId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -193,7 +187,7 @@ export async function getRideData({
 }) {
   try {
     const response = await axios.get(
-      `http://localhost:5000/rides/ride/${rideId}`,
+      `${BASE_URL}/rides/ride/${rideId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

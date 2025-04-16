@@ -4,8 +4,11 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { createContext, useContext, useState } from "react";
 import Cookies from "js-cookie";
 import { useQuery } from "@tanstack/react-query";
-import { Loader } from "lucide-react";
+import { Loader, UserMinus2 } from "lucide-react";
 import { fetchUser } from "@/actions/auth";
+import { toast } from "sonner";
+import { string } from "zod";
+import { error } from "console";
 interface AuthData {
   token: string;
   userData: UserProfileData | null;
@@ -44,18 +47,26 @@ export const AuthProvider: React.FC<{
     () => fetchUser(token!),
     {
       enabled: !!token, // only run if token exists
-      onSuccess: (data) => {
+      onSuccess: (data:{ msg:string,userInfo:UserProfileData, error:any }) => {
+        if(data?.error){
+          Cookies.remove("token");
+          toast(`Unable to fetch the data , ${data.error}`);
+          router.push("/auth");
+        }
         setAuthData({
           token: token!,
-          userData: data?.userInfo || null,
+          userData: data?.userInfo! || null
         });
         if (!authData?.userData) {
           if (pathname == '/auth')
             void router.push("/find-rides");
         }
       },
-      onError: () => {
+      onError: (error: any) => {
         Cookies.remove("token");
+        toast("Unable to fetch the data", {
+          description: error || "Invalid token",
+        });
         router.push("/auth");
       },
       initialData: initialUserData,
@@ -84,7 +95,7 @@ export const AuthProvider: React.FC<{
     <AuthContext.Provider
       value={{ authData, setUserData, setToken, handleSignOut }}
     >
-      {token && isLoading? (
+      {token && isLoading ? (
         <main className="flex min-h-screen w-full items-center justify-center text-lg text-muted-foreground">
           <Loader className="mr-2 size-4 animate-spin" />
           Loading...

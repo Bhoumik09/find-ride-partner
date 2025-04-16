@@ -7,17 +7,6 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
-import {
-    Menubar,
-    MenubarContent,
-    MenubarItem,
-    MenubarMenu,
-    MenubarSeparator,
-    MenubarShortcut,
-    MenubarTrigger,
-} from "@/components/ui/menubar"
-
-
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     Form,
@@ -42,8 +31,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
 import { useRouter } from "next/navigation"
 import Cookies from 'js-cookie'
 import { findRideFormSchema, Rides } from "@/lib/types"
@@ -57,34 +44,36 @@ import { RidesSkeleton } from "@/components/ridesSkeleton"
 export default function FindRidesForm({ allPlaces }: { allPlaces: { id: number, name: string }[] }) {
     const router = useRouter();
     const auth = useAuth();
-    const deleteMutation=useMutation({
-        mutationFn:deleteRide,
-        mutationKey:['deleteRide']
+    const deleteMutation = useMutation({
+        mutationFn: deleteRide,
+        mutationKey: ['deleteRide']
     })
 
-    const [rideData, setRidesData] = useState<any>();
-    console.log(auth.authData?.userData?.gender)
-    const token = Cookies.get('token');
-    const [userRides, setUserRides] = useState<Rides[]|undefined>(undefined);
-    const getUserRide = async () => {
+    const [rideData, setRidesData] = useState<Rides[] | undefined>(undefined);
+    const token: string | undefined = Cookies.get('token');
+    const [userRides, setUserRides] = useState<Rides[] | undefined>(undefined);
+    const getUserRide = async (): Promise<void> => {
         const response: { msg: string, ridesData: Rides[], error: any } = await findUserRides({ token: token as string })
-        if (!response.ridesData) {
-            toast.error("Error on fetching user data");
+        if (response.error) {
+            toast.error("Error on fetching user data", {
+                description: response.error.slice(0, 50),
+                style: { backgroundColor: 'red' }
+            });
             return;
         }
         setUserRides(response?.ridesData)
     }
-    const deleteTheRide=async(id:string)=>{
-        const response :{msg:string,error:any}=await deleteMutation.mutateAsync({token:token!,rideId:id})
-        if(response.msg){
-            toast.success("Ride deleted successfully",{
-                description:response.msg
+    const deleteTheRide = async (id: string): Promise<void> => {
+        const response: { msg: string, error: any } = await deleteMutation.mutateAsync({ token: token!, rideId: id })
+        if (response.msg) {
+            toast.success("Ride deleted successfully", {
+                description: response.msg
             });
-            setUserRides(()=>userRides?.filter((ride:Rides)=>ride.id!==id))
+            setUserRides(() => userRides?.filter((ride: Rides) => ride.id !== id))
 
-        }else{
+        } else {
             toast.warning("Error occured while deleting the ride", {
-                description:response.error
+                description: response.error
             });
 
         }
@@ -111,9 +100,8 @@ export default function FindRidesForm({ allPlaces }: { allPlaces: { id: number, 
         mutationKey: ["findRides"],
         mutationFn: findRides,
     })
-    const [buttonState, setButtonState] = useState<"wait" | "ready">("ready");
     const numbers: number[] = [2, 3, 4, 5, 6, 7, 8, 9, 10];
-    
+
     async function onSubmit(data: z.infer<typeof findRideFormSchema>) {
 
         if (data.source !== "" && data.destination != "" && data.destination === data.source) {
@@ -126,12 +114,11 @@ export default function FindRidesForm({ allPlaces }: { allPlaces: { id: number, 
 
         const response: { msg: string, ridesData: any, error: any } = await findRidesMutation.mutateAsync({ payload: data, token: token as string })
         if (response?.ridesData) {
-            toast.success("Rides Fetched")
+            toast.success("Rides Fetched Successfully")
             setRidesData(response.ridesData);
         } else {
             toast.error("These was an error in fetching rides", response.error);
-            Cookies.remove('token');
-            router.push('/auth')
+
         }
         form.reset()
 
@@ -305,7 +292,7 @@ export default function FindRidesForm({ allPlaces }: { allPlaces: { id: number, 
                                     )}
                                 />
 
-                                {buttonState === "ready" ?
+                                {!findRidesMutation.isLoading ?
                                     < Button type="submit" className="mt-4" >Submit</Button > : <Button className="mt-4" disabled><Loader2 className="animate-spin"></Loader2>Please wait</Button>}
 
                             </form>
@@ -316,27 +303,32 @@ export default function FindRidesForm({ allPlaces }: { allPlaces: { id: number, 
             </div>
             <div className=" w-full flex justify-between px-4 font-bold text-3xl">
                 <p className="font-serif">My Rides</p>
-               
+
             </div>
             <div className="flex overflow-x-scroll scrollbar-hide  gap-9 p-5">
                 {!userRides
                     ? Array.from({ length: 3 }).map((_, idx) => (
                         <RidesSkeleton key={idx} />
                     ))
-                    : userRides?.map((ride: Rides) => (
-                        <RideCard ride={ride} key={ride?.id} deleteTheRide={deleteTheRide} />
+                    : userRides.length == 0 ?
+                        <div className="w-full font-bold">No rides found</div>
+                        : userRides?.map((ride: Rides) => (
+                            <RideCard ride={ride} key={ride?.id} deleteTheRide={deleteTheRide} />
 
-                    ))}
+                        ))}
 
             </div>
-            <div className=" w-full flex justify-center  font-bold text-3xl">
+            {rideData && <div className=" w-full flex justify-center  font-bold text-3xl">
                 <p className="font-serif px-4">Available Rides</p>
-               
-            </div>
+
+            </div>}
 
             <div className="grid grid-cols-1 md:grid-cols-2 p-10 gap-10">
-                {!findRidesMutation.isLoading ? rideData?.map((ride: any) => (
-                    <RideCard ride={ride} key={ride?.id} />)) :
+                {!findRidesMutation.isLoading ? rideData?.length == 0 ?
+                    <div className="w-full text-xl md:col-span-2 text-center font-medium font-serif">No rides found</div>
+
+                    : rideData?.map((ride: Rides) => (
+                        <RideCard ride={ride} key={ride?.id} />)) :
                     Array.from({ length: 3 }).map((_, idx) => (
                         <RidesSkeleton key={idx} />
                     ))

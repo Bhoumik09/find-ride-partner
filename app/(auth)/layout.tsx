@@ -8,8 +8,10 @@ const layout = ({ children }: Readonly<{
 }>) => {
     return (
         <Fragment>
-           <AuthProvider>
-            {children}
+            <AuthProvider>
+                
+
+                {children}
             </AuthProvider>
         </Fragment>
     )

@@ -16,7 +16,7 @@ const layout = async ({ children }: Readonly<{
         redirect('/auth')
         
     }
-    const fetchUser: { msg: string, userInfo: { name: string } } | null = await fetchUserName(token);
+    const fetchUser: { msg?: string, userInfo?: { name: string } , error?:any} | null = await fetchUserName(token);
     
     return (
         <AuthProvider>
@@ -27,7 +27,7 @@ const layout = async ({ children }: Readonly<{
                     <div>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button className='rounded-full' size={'icon'}>{fetchUser?.userInfo.name[0].toUpperCase()}</Button>
+                                <Button className='rounded-full' size={'icon'}>{fetchUser?.userInfo?.name[0].toUpperCase()}</Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
                                 <DropdownMenuItem><Link href="/find-rides">Find Rides</Link>
