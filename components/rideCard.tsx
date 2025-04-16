@@ -2,17 +2,19 @@ import React from "react";
 import { Card, CardContent } from "./ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
-import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarTrigger } from "./ui/menubar";
 import { CarTaxiFront, Clock, MapPin, UsersIcon } from "lucide-react";
 import { Button } from "./ui/button";
-import { useAuth } from "./auth-provider";
+import { AuthContextType, useAuth } from "./auth-provider";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import Link from "next/link";
 import { Rides } from "@/lib/types";
-
-export const RideCard: React.FC<any> = ({ ride , deleteTheRide}:{ride:Rides, deleteTheRide:(id:string)=>void}) => {
-    const auth = useAuth();
-    const userId = auth.authData?.userData?.id;
+type RideCardProps = {
+    ride: Rides;
+    deleteTheRide?: (id: string) => void;
+  };
+export const RideCard: React.FC<RideCardProps> = ({ ride , deleteTheRide}:{ride:Rides, deleteTheRide?:(id:string)=>void}) => {
+    const auth:AuthContextType = useAuth();
+    const userId:string|undefined = auth.authData?.userData?.id;
     return (
         <Card>
             <CardContent>

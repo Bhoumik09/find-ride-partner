@@ -4,9 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from "@/components/ui/separator"
 import { ArrowLeft, Calendar, Clock, MapPin, Users } from "lucide-react"
 import Link from "next/link"
-import Cookies from "js-cookie"
 import { notFound } from "next/navigation"
-import { toast } from "sonner"
 import { cookies } from "next/headers"
 import { Rides } from "@/lib/types"
 const page = async ({ params }: { params: Promise<{ id: string }> }) => {
@@ -53,7 +51,7 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
                             <div className="flex flex-wrap gap-3">
                                 <div className="flex items-center gap-2 bg-muted px-3 py-1 rounded-full">
                                     <Calendar className="h-4 w-4 text-muted-foreground" />
-                                    <span>{new Date(ridesData?.date!).toLocaleDateString("en-GB", {
+                                    <span>{new Date(ridesData?.date).toLocaleDateString("en-GB", {
                                         day: "numeric",
                                         month: "long",
                                         year: "numeric",
@@ -62,7 +60,7 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
                                 </div>
                                 <div className="flex items-center gap-2 bg-muted px-3 py-1 rounded-full">
                                     <Clock className="h-4 w-4 text-muted-foreground" />
-                                    <span>{new Date(ridesData?.time!).toLocaleTimeString("en-GB", {
+                                    <span>{new Date(ridesData?.time).toLocaleTimeString("en-GB", {
                                         hour: 'numeric',
                                         minute: 'numeric'
 

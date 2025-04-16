@@ -64,8 +64,9 @@ export default function RideForm({ allPlaces }: { allPlaces: { id: number, name:
             changeFormState("one");
             return;
         }
-        const { meetingPoint, ...filteredPayload } = values;
-        const response: { msg: string, error: any } = await postRideMutation.mutateAsync({ payload: filteredPayload, token: auth.authData?.token! });
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { meetingPoint:_, ...filteredPayload } = values;
+        const response: { msg: string, error: string } = await postRideMutation.mutateAsync({ payload: filteredPayload, token: auth.authData?.token });
         if (response.msg) {
             form.reset();
             changeFormState("one");
@@ -87,7 +88,7 @@ export default function RideForm({ allPlaces }: { allPlaces: { id: number, name:
 
     }
     const formValues = form.watch();
-    let isOneStepComplete = formValues.date && formValues.destination && formValues.seats && formValues.vehicleName && formValues.source && formValues.time;
+    const isOneStepComplete = formValues.date && formValues.destination && formValues.seats && formValues.vehicleName && formValues.source && formValues.time;
     return (
         <div className="bg-blue-50 xs:px-20 md:px-40 py-20">
             <Form {...form}>

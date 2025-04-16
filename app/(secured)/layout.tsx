@@ -1,7 +1,6 @@
-import { fetchUser, fetchUserName } from '@/actions/auth';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {  fetchUserName } from '@/actions/auth';
 import { Button } from '@/components/ui/button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem,  DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import Link from 'next/link'
 import React, { Fragment } from 'react'
 import { cookies } from 'next/headers';
@@ -16,7 +15,7 @@ const layout = async ({ children }: Readonly<{
         redirect('/auth')
         
     }
-    const fetchUser: { msg?: string, userInfo?: { name: string } , error?:any} | null = await fetchUserName(token);
+    const fetchUser: { msg?: string, userInfo?: { name: string } , error?:string} | null = await fetchUserName(token);
     
     return (
         <AuthProvider>

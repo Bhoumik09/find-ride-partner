@@ -1,32 +1,25 @@
 import getAllPlaces from '@/actions/places';
 import { getRideData } from '@/actions/rides';
-import { notFound } from 'next/navigation';
-import React from 'react'
-import { toast } from 'sonner';
-import RideUpdateForm from './form';
-import { cookies } from 'next/headers';
-import { fetchUserName } from '@/actions/auth';
-import { useAuth } from '@/components/auth-provider';
+import Cookies from 'js-cookie'
+import RideUpdateClient from './RideUpdateClient';
+export default async function Page({ params }: { params:Promise< { id: string }> }) {
+    const { id } = (await params);
+    const token: string = Cookies.get('token');
+    const response = await getRideData({ rideId: id, token }); // Don't pass token here
+    const { error, places } = await getAllPlaces();
 
-const page = async ({ params }: { params: Promise<{ id: string }> }) => {
-    const id = (await params).id;
-    const auth = useAuth();
-    const userId:string|undefined=auth.authData?.userData?.name;
-    const token:string|undefined =auth.authData?.token; 
-    const response = await getRideData({ rideId: id, token: token! });
-    const { error, places }: { error: any, places: { id: number, name: string }[] } = await getAllPlaces();
     if (error) {
-        toast.error("Error fetching places, Pls reload", {style:{backgroundColor:'#FF7276'}})
+        // You can’t use `toast` in server components. Handle this in the client instead
+        console.error("Error fetching places");
     }
-    const { ridesData } = response.data;
-    if (ridesData.user.id !== userId) {
-        notFound()   
-    }
-    return (
-        <div>
-            <RideUpdateForm allPlaces={places} ridesData={ridesData} rideId={id} />
-        </div>
-    )
-}
 
-export default page
+    const { ridesData } = response.data;
+
+    return (
+        <RideUpdateClient
+            places={places}
+            ridesData={ridesData}
+            rideId={id}
+        />
+    );
+}

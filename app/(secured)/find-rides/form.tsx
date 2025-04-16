@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/popover"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import { CalendarIcon, CarTaxiFront, Clock, Loader2, MapPin, Search, UsersIcon } from "lucide-react"
+import { CalendarIcon,  Loader2,  } from "lucide-react"
 import { format } from "date-fns"
 import { toast } from "sonner"
 import { useEffect, useState } from "react"
@@ -38,7 +38,6 @@ import { deleteRide, findRides, findUserRides } from "@/actions/rides"
 import { useMutation } from "@tanstack/react-query"
 import { useAuth } from "@/components/auth-provider"
 import { RideCard } from "@/components/rideCard"
-import { Skeleton } from "@/components/ui/skeleton"
 import { RidesSkeleton } from "@/components/ridesSkeleton"
 
 export default function FindRidesForm({ allPlaces }: { allPlaces: { id: number, name: string }[] }) {
@@ -52,19 +51,9 @@ export default function FindRidesForm({ allPlaces }: { allPlaces: { id: number, 
     const [rideData, setRidesData] = useState<Rides[] | undefined>(undefined);
     const token: string | undefined = Cookies.get('token');
     const [userRides, setUserRides] = useState<Rides[] | undefined>(undefined);
-    const getUserRide = async (): Promise<void> => {
-        const response: { msg: string, ridesData: Rides[], error: any } = await findUserRides({ token: token as string })
-        if (response.error) {
-            toast.error("Error on fetching user data", {
-                description: response.error.slice(0, 50),
-                style: { backgroundColor: 'red' }
-            });
-            return;
-        }
-        setUserRides(response?.ridesData)
-    }
+    
     const deleteTheRide = async (id: string): Promise<void> => {
-        const response: { msg: string, error: any } = await deleteMutation.mutateAsync({ token: token!, rideId: id })
+        const response: { msg: string, error: string } = await deleteMutation.mutateAsync({ token: token!, rideId: id })
         if (response.msg) {
             toast.success("Ride deleted successfully", {
                 description: response.msg
@@ -79,12 +68,23 @@ export default function FindRidesForm({ allPlaces }: { allPlaces: { id: number, 
         }
     }
     useEffect(() => {
+        const getUserRide = async (): Promise<void> => {
+            const response: { msg: string, ridesData: Rides[], error: string } = await findUserRides({ token: token as string })
+            if (response.error) {
+                toast.error("Error on fetching user data", {
+                    description: response.error.slice(0, 50),
+                    style: { backgroundColor: 'red' }
+                });
+                return;
+            }
+            setUserRides(response?.ridesData)
+        }
         if (!token) {
             void router.push('/auth')
             return;
         }
         getUserRide()
-    }, [])
+    }, [token, router])
     const form = useForm<z.infer<typeof findRideFormSchema>>({
         resolver: zodResolver(findRideFormSchema),
         defaultValues: {
@@ -112,12 +112,12 @@ export default function FindRidesForm({ allPlaces }: { allPlaces: { id: number, 
             return;
         }
 
-        const response: { msg: string, ridesData: any, error: any } = await findRidesMutation.mutateAsync({ payload: data, token: token as string })
+        const response: { msg: string, ridesData:Rides[] , error: string } = await findRidesMutation.mutateAsync({ payload: data, token: token as string })
         if (response?.ridesData) {
             toast.success("Rides Fetched Successfully")
             setRidesData(response.ridesData);
         } else {
-            toast.error("These was an error in fetching rides", response.error);
+            toast.error(`These was an error in fetching rides ${response.error}`);
 
         }
         form.reset()
@@ -272,7 +272,7 @@ export default function FindRidesForm({ allPlaces }: { allPlaces: { id: number, 
                                                 >
                                                     <FormItem className="flex items-center space-x-3 space-y-0">
                                                         <FormControl>
-                                                            <RadioGroupItem className="bg-white" value={auth.authData?.userData?.gender!} />
+                                                            <RadioGroupItem className="bg-white" value={auth.authData?.userData?.gender} />
                                                         </FormControl>
                                                         <FormLabel className="font-medium">
                                                             Same Gender

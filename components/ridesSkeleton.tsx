@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardContent } from "./ui/card";
 import { Skeleton } from "./ui/skeleton";
 
-export const RidesSkeleton:React.FC<any>=()=>{
+export const RidesSkeleton:React.FC<unknown>=()=>{
     return(
         <Card  className="w-full min-w-[300px]">
         <CardContent>

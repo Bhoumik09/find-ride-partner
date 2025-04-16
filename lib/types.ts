@@ -53,6 +53,7 @@ export interface Rides {
   price: number;
   phoneNumber: string;
   genderPreference: "male" | "female" | "both";
+  allowInAppChat?:boolean
 }
 export type findRidesFormType = z.infer<typeof findRideFormSchema>;
 export type ridesFormType = z.infer<typeof formSchema>;

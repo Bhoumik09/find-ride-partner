@@ -1,9 +1,8 @@
 "use server";
 import { UserProfileData } from "@/components/auth-provider";
 import { API } from "@/lib/api";
-import axios, { AxiosError, AxiosResponse } from "axios";
-import { cookies } from 'next/headers';
-import { redirect } from "next/navigation";
+import { AxiosError, AxiosResponse } from "axios";
+
 
 interface LoginPayload {
   username: string;
@@ -30,11 +29,11 @@ export async function fetchUser(token: string) {
     if (error instanceof AxiosError) {
       const serverMessage = error.response?.data?.msg || "Session Expired";
       
-      return {error:serverMessage} as { msg:string,userInfo:UserProfileData, error:any };
+      return {error:serverMessage} as { msg:string,userInfo:UserProfileData, error:string };
 
       
     }
-    return {error:"Something went wrong"} as { msg:string,userInfo:UserProfileData, error:any };
+    return {error:"Something went wrong"} as { msg:string,userInfo:UserProfileData, error:string };
 
   }
 }
@@ -68,7 +67,7 @@ export async function fetchUserName(token: string|undefined) {
 export async function login(payload: LoginPayload) {
   try {
     const response:AxiosResponse = await API.post("/auth/login", payload);
-    return response.data as { token: string; error: any ,msg:string };
+    return response.data as { token: string; error: string ,msg:string };
   } catch (error) {
     if (error instanceof AxiosError) {
       // 👇 Check if the server sent a custom error message
@@ -89,7 +88,7 @@ export async function signUp(payload: SignUpPayload) {
   try {
     const response:AxiosResponse = await API.post("/auth/signup", payload);
     console.log(response)
-    return response.data as { token: string; error: any };
+    return response.data as { token: string; error: string };
   } catch (error:any) {
     if (error instanceof AxiosError) {
       // 👇 Check if the server sent a custom error message
@@ -109,7 +108,7 @@ export async function signUp(payload: SignUpPayload) {
 export async function resetPass(payload: LoginPayload) {
   try {
     const response:AxiosResponse = await API.put("/auth/forgot-pass", payload);
-    return response.data as { token: string; error: any };
+    return response.data as { token: string; error: string };
   } catch (error:any) {
     if (error instanceof AxiosError) {
       // 👇 Check if the server sent a custom error message

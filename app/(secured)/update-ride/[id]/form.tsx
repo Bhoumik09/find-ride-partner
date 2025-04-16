@@ -1,7 +1,7 @@
 
 'use client'
-import { postNewRide, updateRide } from "@/actions/rides";
-import { useAuth } from "@/components/auth-provider";
+import {  updateRide } from "@/actions/rides";
+import { AuthContextType, useAuth } from "@/components/auth-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { formSchema } from "@/lib/types";
+import { formSchema, Rides } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -30,18 +30,18 @@ import { z } from "zod";
 
 
 
-export default function RideUpdateForm({ allPlaces, ridesData , rideId}: { allPlaces: { id: number, name: string }[], ridesData: any, rideId:string }) {
-    const auth = useAuth();
-    console.log(ridesData);
+export default function RideUpdateForm({ allPlaces, ridesData , rideId}: { allPlaces: { id: number, name: string }[], ridesData: Rides, rideId:string }) {
+    const auth:AuthContextType = useAuth();
+
     const seats: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
     const router = useRouter()
     const userGender: 'male' | 'female' | undefined = auth.authData?.userData?.gender;
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            source: ridesData?.source?.id,
-            destination: ridesData?.destination.id,
-            date: new Date(ridesData?.date!), // Or fill if you have this too
+            source: Number(ridesData?.source?.id),
+            destination: Number(ridesData?.destination.id),
+            date: new Date(ridesData?.date), // Or fill if you have this too
             time:"",
             vehicleName: ridesData?.vehicle,
             seats: String(ridesData?.numberOfSeats),
@@ -67,8 +67,9 @@ export default function RideUpdateForm({ allPlaces, ridesData , rideId}: { allPl
             changeFormState("one");
             return;
         }
-        const { meetingPoint, ...filteredPayload } = values;
-        const response: { msg: string, error: any } = await updateRideMutation.mutateAsync({ payload: filteredPayload, token: auth.authData?.token!, rideId:rideId });
+         // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { meetingPoint:_meetingPoint, ...filteredPayload } = values;
+        const response: { msg: string, error: string } = await updateRideMutation.mutateAsync({ payload: filteredPayload, token: auth.authData?.token, rideId:rideId });
         if (response.msg) {
             form.reset();
             toast.success("Ride is updated succesfully",{style:{backgroundColor:'lightgreen'}});
@@ -99,9 +100,9 @@ export default function RideUpdateForm({ allPlaces, ridesData , rideId}: { allPl
         });
         if (ridesData?.source?.id && ridesData?.destination?.id) {
             form.reset({
-                source: ridesData?.source?.id,
-                destination: ridesData.destination.id,
-                date: new Date(ridesData?.date!), // Or fill if you have this too
+                source: Number(ridesData?.source?.id),
+                destination: Number(ridesData?.destination?.id),
+                date: new Date(ridesData?.date), // Or fill if you have this too
                 time: formattedTime,
                 vehicleName: ridesData?.vehicle,
                 seats: String(ridesData?.numberOfSeats),
@@ -114,10 +115,10 @@ export default function RideUpdateForm({ allPlaces, ridesData , rideId}: { allPl
                 additionalInfo: ridesData?.additionalInfo,
             });
         }
-    }, [ridesData]);
+    }, [ridesData, form]);
 
     const formValues = form.watch();
-    let isOneStepComplete = formValues.date && formValues.destination && formValues.seats && formValues.vehicleName && formValues.source && formValues.time;
+    const isOneStepComplete = formValues.date && formValues.destination && formValues.seats && formValues.vehicleName && formValues.source && formValues.time;
     return (
         <div className="bg-blue-50 xs:px-20 md:px-40 py-20">
             <Form {...form}>

@@ -4,11 +4,10 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { createContext, useContext, useState } from "react";
 import Cookies from "js-cookie";
 import { useQuery } from "@tanstack/react-query";
-import { Loader, UserMinus2 } from "lucide-react";
+import { Loader } from "lucide-react";
 import { fetchUser } from "@/actions/auth";
 import { toast } from "sonner";
-import { string } from "zod";
-import { error } from "console";
+
 interface AuthData {
   token: string;
   userData: UserProfileData | null;
@@ -21,7 +20,7 @@ export interface UserProfileData {
   gender: "male" | "female";
 }
 
-interface AuthContextType {
+export interface AuthContextType {
   authData: AuthData | null;
   setUserData: (data: UserProfileData) => void;
   setToken: (token: string) => void;
@@ -42,12 +41,12 @@ export const AuthProvider: React.FC<{
   const router = useRouter();
   const pathname = usePathname()
   const token = Cookies.get("token");
-  const { data, isLoading } = useQuery(
+  const {  isLoading } = useQuery(
     ["fetchUser"],
     () => fetchUser(token!),
     {
       enabled: !!token, // only run if token exists
-      onSuccess: (data:{ msg:string,userInfo:UserProfileData, error:any }) => {
+      onSuccess: (data:{ msg:string,userInfo:UserProfileData, error:string }) => {
         if(data?.error){
           Cookies.remove("token");
           toast(`Unable to fetch the data , ${data.error}`);
@@ -55,14 +54,14 @@ export const AuthProvider: React.FC<{
         }
         setAuthData({
           token: token!,
-          userData: data?.userInfo! || null
+          userData: data?.userInfo || null
         });
         if (!authData?.userData) {
           if (pathname == '/auth')
             void router.push("/find-rides");
         }
       },
-      onError: (error: any) => {
+      onError: (error: string) => {
         Cookies.remove("token");
         toast("Unable to fetch the data", {
           description: error || "Invalid token",

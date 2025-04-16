@@ -57,7 +57,7 @@ export default function Home() {
     const onLoginSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const data:{ token?: string; error?: any ,msg?:string } = await loginMutation.mutateAsync({ username: loginUser!, password: loginPassword!, phoneNumber: numberLogin! })
+            const data:{ token?: string; error?: string ,msg?:string } = await loginMutation.mutateAsync({ username: loginUser!, password: loginPassword!, phoneNumber: numberLogin! })
             if (!data || data.error) {
                 toast.error(data?.error || 'Un oh!An unknown error occured', {
                     style: { backgroundColor: 'red' }
