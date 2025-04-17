@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from "@/components/ui/separator"
 import { ArrowLeft, Calendar, Clock, MapPin, Users } from "lucide-react"
 import Link from "next/link"
-import { notFound } from "next/navigation"
 import { cookies } from "next/headers"
 import { Rides } from "@/lib/types"
 const page = async ({ params }: { params: Promise<{ id: string }> }) => {
