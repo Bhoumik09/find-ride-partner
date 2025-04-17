@@ -115,7 +115,7 @@ export default function Home() {
                 return;
             }
             if (data.msg) {
-                toast.success("Signed in successfully")
+                toast.success("Password reset successfull")
 
                 setActiveTab('account')
                 return;
@@ -134,7 +134,7 @@ export default function Home() {
 
     return (
         <div className="flex flex-col  gap-3 w-full h-screen  bg-gradient-to-br from-blue-50 to-blue-100     justify-center items-center">
-            <div className="text-center font-medium"> Welcome to your personal assistant — here to help you find the perfect partner. </div>  
+            <div className="text-center font-medium p-2"> Welcome to your assistant — here to help you find the perfect travel partners. </div>  
 
             <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value)} className=" w-full lg:max-w-xl">
                 <TabsList className="grid w-full grid-cols-3 transition-all duration-500">
