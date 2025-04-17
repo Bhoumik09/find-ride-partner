@@ -2,6 +2,7 @@ import getAllPlaces from '@/actions/places';
 import { getRideData } from '@/actions/rides';
 import Cookies from 'js-cookie'
 import RideUpdateClient from './RideUpdateClient';
+import { Rides } from '@/lib/types';
 export default async function Page({ params }: { params:Promise< { id: string }> }) {
     const { id } = (await params);
     const token: string = Cookies.get('token');
@@ -13,7 +14,7 @@ export default async function Page({ params }: { params:Promise< { id: string }>
         console.error("Error fetching places");
     }
 
-    const { ridesData } = response.data;
+    const { ridesData }:{ridesData:Rides}|undefined = response.data;
 
     return (
         <RideUpdateClient
