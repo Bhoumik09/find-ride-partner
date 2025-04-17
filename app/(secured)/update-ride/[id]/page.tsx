@@ -1,10 +1,8 @@
 import getAllPlaces from '@/actions/places';
 import { getRideData } from '@/actions/rides';
-import Cookies from 'js-cookie'
 import RideUpdateClient from './RideUpdateClient';
 import { Rides } from '@/lib/types';
 import { cookies } from 'next/headers';
-import { notFound } from 'next/navigation';
 export default async function Page({ params }: { params:Promise< { id: string }> }) {
     const { id } = (await params);
     const token: string =(await cookies()).get('token').value;
