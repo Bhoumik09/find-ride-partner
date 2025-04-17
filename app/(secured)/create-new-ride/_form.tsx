@@ -417,7 +417,7 @@ export default function RideForm({ allPlaces }: { allPlaces: { id: number, name:
                                 />
                                 <div className="flex justify-between mt-2">
                                     <Button variant={"outline"} onClick={() => changeFormState("one")} type="button">Back</Button>
-                                    {!postRideMutation.isLoading ? <Button disabled={!isOneStepComplete} type="submit">Publish Ride</Button> : <Button disabled={!isOneStepComplete} type="submit" className="cursor-not-allowed" variant={"default"}>
+                                    {!postRideMutation.isLoading ? <Button disabled={!isOneStepComplete} type="submit">Publish Ride</Button> : <Button disabled type="button" className="cursor-not-allowed" variant={"default"}>
                                         <Loader className="animate-spin" /> Publishing...</Button>}
 
                                 </div>

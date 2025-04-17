@@ -449,7 +449,7 @@ export default function RideUpdateForm({ allPlaces, ridesData , rideId}: { allPl
                                 />
                                 <div className="flex justify-between mt-2">
                                     <Button variant={"outline"} onClick={() => changeFormState("one")} type="button">Back</Button>
-                                    {!updateRideMutation.isLoading ? <Button disabled={!isOneStepComplete} type="submit">Update Ride</Button> : <Button disabled={!isOneStepComplete} type="submit" className="cursor-not-allowed" variant={"default"}>
+                                    {!updateRideMutation.isLoading ? <Button disabled={!isOneStepComplete} type="submit">Update Ride</Button> : <Button  type="button" className="cursor-not-allowed" variant={"default"}>
                                         <Loader className="animate-spin" /> Updating...</Button>}
 
                                 </div>
