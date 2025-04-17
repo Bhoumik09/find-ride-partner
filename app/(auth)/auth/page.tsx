@@ -65,7 +65,7 @@ export default function Home() {
             }
             if (data && data.token) {
                 toast.success("Signed in successfully", {
-                    style: { backgroundColor: 'green' }
+                    style: { backgroundColor: 'lightgreen' }
                 })
                 setToken(data.token)
             }
@@ -87,7 +87,7 @@ export default function Home() {
                 return;
             }
             if (data.msg) {
-                toast.success("Signed in successfully")
+                toast.success("Signup  successfull")
 
                 setActiveTab('account')
                 return;
