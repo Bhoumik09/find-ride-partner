@@ -63,10 +63,11 @@ export const AuthProvider: React.FC<{
       },
       onError: (error: string) => {
         Cookies.remove("token");
+        router.push("/auth");
+
         toast("Unable to fetch the data", {
           description: error || "Invalid token",
         });
-        router.push("/auth");
       },
       initialData: initialUserData,
     }

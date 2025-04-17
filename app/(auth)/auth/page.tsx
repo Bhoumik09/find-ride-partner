@@ -226,7 +226,7 @@ export default function Home() {
                             </CardContent>
                             <CardFooter className="transition-all duration-1000" >
                                 {signUpMutation.isLoading ? <Button className="" disabled form="signup" type='button'>
-                                    <Loader className="animate-spin" /> Saving password...</Button> : <Button className="cursor-pointer transition-all" form="signup" type={'submit'}>Save password</Button>}
+                                    <Loader className="animate-spin" /> Creating account...</Button> : <Button className="cursor-pointer transition-all" form="signup" type={'submit'}>Create Account</Button>}
                             </CardFooter>
                         </form>
                     </Card>
