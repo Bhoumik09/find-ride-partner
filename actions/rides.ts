@@ -1,7 +1,8 @@
 import { API } from "@/lib/api";
 import { BASE_URL } from "@/lib/constants";
-import { findRidesFormType, ridesFormType } from "@/lib/types";
+import { findRidesFormType, Rides, ridesFormType } from "@/lib/types";
 import axios, { AxiosError } from "axios";
+import { notFound } from "next/navigation";
 
 export async function postNewRide({
   payload,
@@ -194,7 +195,10 @@ export async function getRideData({
         },
       }
     );
-    return response;
+    if(response.status!==200){
+      notFound()
+    }
+    return response.data as {msg:string, ridesData:Rides};
     // Log the response URL and status
   } catch (error) {
     if (error instanceof AxiosError) {
