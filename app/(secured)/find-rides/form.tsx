@@ -92,7 +92,7 @@ export default function FindRidesForm({ allPlaces }: { allPlaces: { id: number, 
             destination: "", // Set default value to the first place's ID
             dob: undefined, // Set default value for Date of Journey to today's date
             number_people: "", // Default number of passengers
-            gender: "both", // Default gender preference
+            gender: undefined, // Default gender preference
         }
 
     })
@@ -219,8 +219,10 @@ export default function FindRidesForm({ allPlaces }: { allPlaces: { id: number, 
                                                             mode="single"
                                                             selected={field.value ? new Date(field.value) : undefined}
                                                             onSelect={field.onChange}
-                                                            disabled={(date) =>
-                                                                date > new Date() || date < new Date("1900-01-01")
+                                                            disabled={(date: Date) =>{
+                                                                const today = new Date();
+                                                                today.setHours(0, 0, 0, 0); // reset time to midnight
+                                                                return date < today;}
                                                             }
                                                             initialFocus
                                                         />

@@ -103,9 +103,9 @@ const page = async ({ params }: { params: Promise<{ id: string }> }) => {
                     </div>
                 </CardContent>
                 <CardFooter className="bg-muted/30 flex justify-between">
-                    <div className="text-2xl font-bold">{ridesData.user.name.toUpperCase()}</div>
-                    <Button asChild size="lg">
-                        <Link href={`https://wa.me/+91${ridesData.user.phoneNumber}`}>Contact the Creater</Link>
+                    <div className="text-sm sm:text-xl font-bold">{ridesData.user.name}</div>
+                    <Button asChild size="sm">
+                        <Link href={`https://wa.me/${ridesData.phoneNumber}`}>Contact the Creater</Link>
                        
                     </Button>
                 </CardFooter>
