@@ -10,11 +10,12 @@ import { Rides } from "@/lib/types"
 const page = async ({ params }: { params: Promise<{ id: string }> }) => {
     const id = (await params).id;
     const token = (await cookies()).get('token')?.value;
-    const response = await getRideData({ rideId: id, token:token! })
-    if (response.status !== 200) {
-        notFound()
+    const response:{msg:string, ridesData:Rides} = await getRideData({ rideId: id, token }); // Don't pass token here
+    if(response?.msg==='Invalid token'){
+        (await cookies()).delete('token');
+        
     }
-    const { ridesData }:{ridesData:Rides} = response.data;
+    const ridesData=response.ridesData;
     return (
         <div className="">
             <header className="bg-gradient-to-br from-red-100 to-red-200 shadow-sm ">
