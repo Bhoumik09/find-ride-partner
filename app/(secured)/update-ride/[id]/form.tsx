@@ -47,7 +47,7 @@ export default function RideUpdateForm({ allPlaces, ridesData , rideId}: { allPl
             seats: String(ridesData?.numberOfSeats),
             price: ridesData?.price,
             genderPreference: ridesData?.genderPreference,
-            meetingPointArr: [...ridesData.meetingPoints],
+            meetingPointArr: [...ridesData?.meetingPoints],
             meetingPoint: "",
             allowChat: ridesData?.allowInAppChat,
             number: ridesData?.phoneNumber,
@@ -91,7 +91,7 @@ export default function RideUpdateForm({ allPlaces, ridesData , rideId}: { allPl
     }
     useEffect(() => {
         
-        const rideTime = new Date(ridesData.time);
+        const rideTime = new Date(ridesData?.time);
 
         const formattedTime = rideTime.toLocaleTimeString([], {
             hour: '2-digit',
@@ -108,7 +108,7 @@ export default function RideUpdateForm({ allPlaces, ridesData , rideId}: { allPl
                 seats: String(ridesData?.numberOfSeats),
                 price: ridesData?.price,
                 genderPreference: ridesData?.genderPreference,
-                meetingPointArr: [...ridesData.meetingPoints],
+                meetingPointArr: [...ridesData?.meetingPoints],
                 meetingPoint: "",
                 allowChat: ridesData?.allowInAppChat,
                 number: ridesData?.phoneNumber,
