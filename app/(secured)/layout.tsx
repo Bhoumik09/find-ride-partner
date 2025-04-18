@@ -33,7 +33,8 @@ const layout = async ({ children }: Readonly<{
                                 </DropdownMenuItem>
                                 <DropdownMenuItem> <Link href="/create-new-ride">Offer a ride</Link>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem><Link href="/">How it works</Link>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem><Link href="mailto:bhoumikchopra2022@vitbhopal.ac.in">Contact Developer</Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem className='bg-red-500 !font-bold hover:!bg-red-200' asChild><LogoutButton />
