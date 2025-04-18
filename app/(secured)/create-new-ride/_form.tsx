@@ -76,7 +76,7 @@ export default function RideForm({ allPlaces }: { allPlaces: { id: number, name:
 
         }
     }
-    const seats: number[] = [1,2, 3, 4, 5, 6, 7, 8, 9, 10,11,12,13,14,15,16,17];
+    const seats: number[] = [1,2, 3, 4, 5, 6, 7, 8, 9, 10,11];
     const [formState, changeFormState] = useState<"one" | "two">("one");
     const addingMeetingPoint = () => {
         const ptArray: string[] = form.watch("meetingPointArr") || [];
@@ -291,7 +291,7 @@ export default function RideForm({ allPlaces }: { allPlaces: { id: number, name:
                                         <FormItem>
                                             <FormLabel>Price</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Price" type="number" min={1} className="pl-3" {...field} />
+                                                <Input placeholder="Price" type="number" min={10} max={10} className="pl-3" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

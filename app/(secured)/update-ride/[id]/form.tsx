@@ -60,7 +60,6 @@ export default function RideUpdateForm({ allPlaces, ridesData , rideId}: { allPl
         mutationFn: updateRide,
     });
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values);
         if (values.source === values.destination) {
             form.setError("source", { message: "Source and destination cannot be the same" });
             form.setError("destination", { message: "Source and destination cannot be the same" });
@@ -322,7 +321,7 @@ export default function RideUpdateForm({ allPlaces, ridesData , rideId}: { allPl
                                         <FormItem>
                                             <FormLabel>Price</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Price"  type="number" min={1} className="pl-3" {...field} />
+                                                <Input placeholder="Price"  type="number" min={10} max={10} className="pl-3" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

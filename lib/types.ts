@@ -17,7 +17,7 @@ export const formSchema = z.object({
   meetingPoint: z.string(),
   allowChat: z.boolean(),
   additionalInfo: z.string().optional(),
-  number: z.string({ required_error: "Enter your mobile number" }),
+  number: z.string({ required_error: "Enter your mobile number" }).max(10).min(10),
 });
 export const findRideFormSchema = z.object({
   source: z.string().optional(),
