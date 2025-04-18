@@ -1,4 +1,3 @@
-import { API } from "@/lib/api";
 import { BASE_URL } from "@/lib/constants";
 import { findRidesFormType, Rides, ridesFormType } from "@/lib/types";
 import axios, { AxiosError } from "axios";
