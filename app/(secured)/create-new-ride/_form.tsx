@@ -305,7 +305,7 @@ export default function RideForm({ allPlaces }: { allPlaces: { id: number, name:
                                         <FormItem>
                                             <FormLabel>Phone number</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Enter your mobile number" type="tel" minLength={10}  maxLength={10} className="pl-3"  {...field} />
+                                                <Input placeholder="Enter your mobile number" type="tel" pattern="[0-9]{10}" minLength={10}  maxLength={10} className="pl-3"  {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
