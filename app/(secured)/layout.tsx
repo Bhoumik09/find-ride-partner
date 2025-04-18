@@ -34,7 +34,7 @@ const layout = async ({ children }: Readonly<{
                                 <DropdownMenuItem> <Link href="/create-new-ride">Offer a ride</Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem><Link href="https://mail.google.com/mail/?view=cm&fs=1&to=bhoumikchopra2022@vitbhopal.ac.in&su=Inquiry&body=Hello%2C%20I%20would%20like%20to%20ask%20about%20your%20services.">Contact me on Gmail</Link>
+                                <DropdownMenuItem><Link href="https://mail.google.com/mail/?view=cm&fs=1&to=bhoumikchopra2022@vitbhopal.ac.in&su=Inquiry&body=Hello%2C%20I%20would%20like%20to%20ask%20about%20your%20services.">Contact Developer</Link>
 
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
