@@ -21,6 +21,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { CalendarIcon, Car, Clock, Info, Loader, MapPin } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -273,7 +274,7 @@ export default function RideForm({ allPlaces }: { allPlaces: { id: number, name:
 
                                 </div>
                                 <div className="flex justify-between mt-2">
-                                    <Button variant={"outline"} type="button">Cancel</Button>
+                                    <Link href={'/find-rides'}><Button variant={"outline"} type="button">Cancel</Button></Link>
                                     <Button type="button" disabled={!isOneStepComplete} onClick={() => changeFormState("two")}>Continue</Button>
 
                                 </div>
@@ -291,7 +292,7 @@ export default function RideForm({ allPlaces }: { allPlaces: { id: number, name:
                                         <FormItem>
                                             <FormLabel>Price</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Price" type="number" min={10} max={10} className="pl-3" {...field} />
+                                                <Input placeholder="Price" type="number"  className="pl-3" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -304,7 +305,7 @@ export default function RideForm({ allPlaces }: { allPlaces: { id: number, name:
                                         <FormItem>
                                             <FormLabel>Phone number</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Enter your mobile number" type="tel" min={1} className="pl-3" max={12} {...field} />
+                                                <Input placeholder="Enter your mobile number" type="tel" minLength={10}  maxLength={10} className="pl-3"  {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

@@ -334,7 +334,7 @@ export default function RideUpdateForm({ allPlaces, ridesData , rideId}: { allPl
                                         <FormItem>
                                             <FormLabel>Phone number</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="Enter your mobile number" type="tel" min={10} max={10} className="pl-3" {...field} />
+                                                <Input placeholder="Enter your mobile number" type="tel" minLength={10}  maxLength={10} className="pl-3" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
