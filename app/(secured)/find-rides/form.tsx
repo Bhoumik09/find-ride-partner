@@ -92,7 +92,7 @@ export default function FindRidesForm({ allPlaces }: { allPlaces: { id: number, 
             destination: "", // Set default value to the first place's ID
             dob: undefined, // Set default value for Date of Journey to today's date
             number_people: "", // Default number of passengers
-            gender: undefined, // Default gender preference
+            gender: 'both', // Default gender preference
         }
 
     })
