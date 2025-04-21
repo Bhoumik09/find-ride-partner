@@ -151,7 +151,7 @@ export default function RideUpdateForm({ allPlaces, ridesData , rideId}: { allPl
                                     control={form.control}
                                     name="source"
                                     render={({ field }) => (
-                                        <FormItem className="w-full">
+                                        <FormItem className="w-full overflow-hidden">
                                             <FormLabel><MapPin /> Source</FormLabel>
                                             <Select disabled={!allPlaces} onValueChange={field.onChange} value={String(field.value)} >
                                                 <FormControl>
@@ -174,7 +174,7 @@ export default function RideUpdateForm({ allPlaces, ridesData , rideId}: { allPl
                                     control={form.control}
                                     name="destination"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="w-full overflow-hidden">
                                             <FormLabel> <MapPin /> Destination</FormLabel>
                                             <Select disabled={!allPlaces} onValueChange={field.onChange} value={String(field.value)} >
                                                 <FormControl>

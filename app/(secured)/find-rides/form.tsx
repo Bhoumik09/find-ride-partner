@@ -141,7 +141,7 @@ export default function FindRidesForm({ allPlaces }: { allPlaces: { id: number, 
                                         control={form.control}
                                         name="source"
                                         render={({ field }) => (
-                                            <FormItem className="w-full" >
+                                            <FormItem className="w-full overflow-hidden" >
                                                 <FormLabel>Source</FormLabel>
                                                 <Select onValueChange={field.onChange} value={typeof field.value === 'string' ? field.value : String(field.value)} defaultValue={String(field.value)} >
                                                     <FormControl>
@@ -164,7 +164,7 @@ export default function FindRidesForm({ allPlaces }: { allPlaces: { id: number, 
                                         control={form.control}
                                         name="destination"
                                         render={({ field }) => (
-                                            <FormItem className="w-full">
+                                            <FormItem className="w-full overflow-hidden">
                                                 <FormLabel>Destination</FormLabel>
                                                 <Select onValueChange={field.onChange} value={typeof field.value === 'string' ? field.value : String(field.value)} defaultValue={String(field.value)} >
                                                     <FormControl>

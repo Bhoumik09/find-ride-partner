@@ -123,7 +123,7 @@ export default function RideForm({ allPlaces }: { allPlaces: { id: number, name:
                                     control={form.control}
                                     name="source"
                                     render={({ field }) => (
-                                        <FormItem className="w-full">
+                                        <FormItem className="w-full overflow-hidden">
                                             <FormLabel><MapPin /> Source</FormLabel>
                                             <Select disabled={!allPlaces} onValueChange={field.onChange} >
                                                 <FormControl>
@@ -146,7 +146,7 @@ export default function RideForm({ allPlaces }: { allPlaces: { id: number, name:
                                     control={form.control}
                                     name="destination"
                                     render={({ field }) => (
-                                        <FormItem>
+                                        <FormItem className="w-full overflow-hidden">
                                             <FormLabel> <MapPin /> Destination</FormLabel>
                                             <Select disabled={!allPlaces} onValueChange={field.onChange} >
                                                 <FormControl>
