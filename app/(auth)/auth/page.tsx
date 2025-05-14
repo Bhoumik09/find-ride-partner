@@ -105,8 +105,8 @@ export default function Home() {
     const onResetPassword = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            if(forgotPassCnfPass===forgotPassNewPass){
-                toast.error('New password and confirmed password should not be same', { style: { backgroundColor: 'red' } })
+            if(forgotPassCnfPass!==forgotPassNewPass){
+                toast.error('New password and confirmed password should  be same', { style: { backgroundColor: 'red' } })
                 return
             }
             const data: { msg?: string, error?: string } = await resetPassMutation.mutateAsync({ username: forgotPassUsername!, password: forgotPassNewPass!, phoneNumber: forgotPassPhone! })
@@ -246,7 +246,7 @@ export default function Home() {
                                     <Input id="pass_user" required placeholder="Enter your username" type="text" onChange={(e) => { setForgotPassUsername(e.target.value) }} />
                                 </div>
                                 <div className="space-y-1">
-                                    <Label htmlFor="pass">Your Password</Label>
+                                    <Label htmlFor="pass">Your Phone Number</Label>
                                     <Input id="pass" min={10}  type="tel" placeholder="Enter your phone number" onChange={(e) => { setForgotPassPhone(e.target.value) }} />
                                 </div>
                                 <div className="space-y-1">
