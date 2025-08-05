@@ -1,6 +1,26 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Safar Saathi
+Safar Saathi is a full-stack ride-matching platform built to revolutionize the daily commute for students and professionals. By connecting users with ideal travel partners, we're not just getting people from point A to B; we're making the journey more affordable, collaborative, and enjoyable. Our platform intelligently matches users based on their routes, schedules, budgets, and personal preferences, transforming a mundane commute into a shared experience.
 
-## Getting Started
+Key Features
+Intelligent Matching & Filtering
+Our core feature is a powerful matching engine that finds the perfect travel partners for you. The platform uses advanced criteria such as route, time, budget, and gender preferences to generate the most compatible matches. With our integrated filters, you can further refine your search to find the perfect travel buddy based on cost and compatibility.
+
+High-Performance & Type-Safe Development
+Safar Saathi is built on a modern and robust technology stack. We leveraged Next.js and TypeScript for both the frontend and backend, ensuring a type-safe, high-performance, and scalable application. This approach guarantees a seamless user experience while providing a stable foundation for future growth.
+
+Intuitive and Accessible UI
+We believe great software should be a pleasure to use. That's why we designed a responsive and accessible UI with shadcn/ui, providing a clean, modern, and consistent experience across all devices. We also used React Hook Form for seamless and efficient form handling, making it easy for users to set up their profiles and preferences.
+
+Robust Data Management
+Our backend is powered by Prisma ORM, which provides a simple yet powerful way to interact with our PostgreSQL database. This setup ensures that your data—from user profiles to matching preferences—is managed securely and efficiently.
+
+Technologies Used
+Frontend: Next.js, TypeScript, shadcn/ui, React Hook Form, Context API
+
+Backend: Next.js, TypeScript, Prisma ORM, PostgreSQL
+
+Getting Started
+Follow these simple steps to get Safar Saathi up and running on your local machine.
 
 First, run the development server:
 
