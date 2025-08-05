@@ -1,3 +1,7 @@
+
+
+<img width="1920" height="1020" alt="image" src="https://github.com/user-attachments/assets/5b75ec32-1e1c-40b9-83da-6b9e54b1830a" />
+
 **Safar Saathi**
 Safar Saathi is a full-stack ride-matching platform built to revolutionize the daily commute for students and professionals. By connecting users with ideal travel partners, we're not just getting people from point A to B; we're making the journey more affordable, collaborative, and enjoyable. Our platform intelligently matches users based on their routes, schedules, budgets, and personal preferences, transforming a mundane commute into a shared experience.
 
@@ -18,6 +22,11 @@ Our backend is powered by Prisma ORM, which provides a simple yet powerful way t
 **Frontend**: Next.js, TypeScript, shadcn/ui, React Hook Form, Context API
 
 **Backend**: Next.js, TypeScript, Prisma ORM, PostgreSQL
+
+<img width="1920" height="1020" alt="image" src="https://github.com/user-attachments/assets/914a19f5-e2b9-4c7b-9859-bc94723e010e" />
+
+<img width="1920" height="1020" alt="image" src="https://github.com/user-attachments/assets/3111eb62-0b52-4b04-9d1e-32b43234b345" />
+
 
 Getting Started
 Follow these simple steps to get Safar Saathi up and running on your local machine.
